@@ -34,6 +34,7 @@ export const register= async(req,res)=>{
 }
 
  export const login =async(req,res)=>{
+    console.log("this is inside login ")
         const {email,password}= req.body;
         if(!email||!password){
            return res.json({success:false,message:"Email or Password is missing"})
@@ -44,7 +45,7 @@ export const register= async(req,res)=>{
                return res.json({success:false,message:'Invalid email'}) 
             }
             const IsMatch = await bcrypt.compare(password,user.password) ;
-            if(!isMatch){
+            if(!IsMatch){
                  return res.json({success:false,message:'Invalid password'})
            }
 
