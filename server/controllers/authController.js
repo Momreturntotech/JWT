@@ -3,7 +3,9 @@ import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
 
 export const register= async(req,res)=>{
+    console.log("it is insid this")
     const {name,email,password}=req.body
+    console.log(name,email,password)
     if(!name || !email || !password){
         return res.json({success:false,message:'missing details'})
     }
