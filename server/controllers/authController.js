@@ -96,6 +96,7 @@ export const logout =async(req,res)=>{
 
 //send verification mail to the user
 export const sendVerifyOtp = async(req,res)=>{
+    console.log("This is inside verify opt")
     try {
         const {userId}=req.body;
         const user = await userModel.findById(userId);
