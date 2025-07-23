@@ -92,3 +92,75 @@ export const logout =async(req,res)=>{
         }
     
 }
+
+
+//send verification mail to the user
+export const sendVerifyOtp = async(req,res)=>{
+    try {
+        const {userId}=req.body;
+        const user = await userModel.findById(userId);
+
+        //Checking whether the account is already verified 
+        if(user.isAccountVerified){
+            return res.json({success:false,message:"Account already Verified"})
+        }
+
+        const otp=String(Math.floor(1000000 + Math.random() * 900000));
+
+        user.verifyOtp= otp;
+        user.verifyOtpExpiresAt=Date.now() + 24 * 60 * 60 * 1000
+        await user.save();
+        const mailOptions={
+            from:process.env.SENDER_EMAIL,
+            to:user.email,
+            subject:"Account Verification Otp",
+            text:`Your Otp is ${otp} Verify your acoount using this otp}`
+
+        }
+        await transporter.sendMail(mailOptions  )
+
+         return  res.json({success:true});
+
+
+        
+    } catch (error) {
+        res.json({success:false,message:error.message})
+        
+    }
+
+}
+
+
+export const verifyEmail=async(req,res)=>{
+    const   {userId,otp} = req.body;
+    if(!userId || !otp) {
+        return res.json({success:false,message:'Missing Details'})
+    }
+    try {
+        const user =  await  userModel.findById(userId)
+        if(!user){
+            return res.json({success:false,message:"user Not Found"})
+        }
+        if(user.verifyOtp==='' || user.verifyOtp !== otp){
+             return res.json({success:false,message:"Invalid Otp"})
+           
+        }
+        if(user.verifyOtpExpiresAt < Date.now()){
+            return res.json({success:false,message:"Otp Expired"})
+        }
+
+        user.isAccountVerified=true;
+        user.verifyOtp='';
+        user.verifyOtpExpiresAt=0;
+
+        await user.save();
+        return res.json({success:true,message:"Email Verified successfully"})
+        
+    } catch (error) {
+
+        res.json({success:false,message:error.message})
+        
+    }
+
+
+}
