@@ -16,7 +16,6 @@ export const register= async(req,res)=>{
             return res.json({success:false,message:"User ALready Exists"})
         }
         const hashedPassword= await bcrypt.hash(password,10)
-
         const user=new userModel({name,email,password:hashedPassword})
         await user.save();
         const token=jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'7d'})
@@ -168,6 +167,9 @@ export const verifyEmail=async(req,res)=>{
 
 //Check if the user is Authenticated
 export const isAuthenticated= async(req,res)=>{
+
+            
+    console.log("this is with in serve is Authenticated")
     try {
         return  res.json({success:true})
     } catch (error) {
